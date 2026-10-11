@@ -97,6 +97,30 @@ Template per connector: Docs · Version · Auth/roles/regions · Source fields/g
 
 ## CON-05 — Shopify Admin GraphQL (orders, products, inventory, customers L1/L2, fulfillments) — **R1** (v0.2: India store in R1 via WP-12; UK/US/EU stores with R2 multi-market), core, **read**
 
+**Local implementation facts (2026-10-12, first manual slice; not acceptance):**
+Human-operated credential setup, multiple connections and direct paginated read
+queries now target Admin GraphQL **2026-07** at
+`https://{validated-shop}.myshopify.com/admin/api/2026-07/graphql.json`.
+GraphQL operations validated against that version: shop/currentAppInstallation,
+products, productVariants, inventoryItems, inventoryItem.inventoryLevels and
+order/lineItems plus orders. Scope floor for this slice: read_orders/read_products/
+read_inventory/read_locations; reject write_ scopes. No customer identity fields.
+Shop.billingAddress.countryCodeV2 is validated but deprecated in this version;
+only the country code is requested, not address fields. A future API upgrade must
+verify its replacement. Currency/timezone come from Shop, never a guessed market.
+
+Dev Dashboard client-credentials grant at `/admin/oauth/access_token` is supported
+only when app and store share the same organization; client ID/secret exchange
+returns an expiring token. Also accept a human-provisioned offline token from an
+authorized existing installation. New OAuth install flow/refresh adapters are not
+implemented. Per-connection credential_ref points to encrypted local devfile data;
+no secrets in connector config. Current facts verified against official docs:
+https://shopify.dev/docs/apps/build/authentication-authorization/client-credentials-grant
+and https://shopify.dev/docs/apps/build/dev-dashboard/create-apps-using-dev-dashboard
+and https://shopify.dev/docs/api/admin-graphql/2026-07/queries/inventoryItems .
+Manual import is bounded to 60-day order creation history, with nested pagination;
+bulk/webhook/Payments and scope approvals remain pending. DISC-10/29 stay open.
+
 **Docs (Documented):** access scopes https://shopify.dev/docs/api/usage/access-scopes (S20); Order object https://shopify.dev/docs/api/admin-graphql/latest/objects/Order (S21, version 2026-07); bulk operations https://shopify.dev/docs/api/usage/bulk-operations/queries (S22); webhooks https://shopify.dev/docs/apps/build/webhooks (S23); protected customer data https://shopify.dev/docs/apps/launch/protected-customer-data (S24); versioning https://shopify.dev/docs/api/usage/versioning (S25); rate limits https://shopify.dev/docs/api/usage/limits (S26).
 **Version:** Admin GraphQL **2026-07** (S21). Quarterly releases; stable versions 2025-07 … 2027-01; ≥12 months support; unsupported versions fall forward to the oldest supported (S25). Pin per connector in `ing.connector.api_version`; upgrade review each quarter. REST is legacy (S26) — not used.
 **Auth / scopes:** custom app per store, created **through the currently supported path** (Shopify's app-creation path changed over time; DISC-10 confirms the current custom-app creation path and how `read_all_orders` is approved for it) — five stores (IN, UK, US, FR, DE — assumption: one shop per market, DISC-10). Scopes: `read_orders`, `read_all_orders` (**needed for orders older than 60 days; approval case-by-case** — S20; request path per DISC-10), `read_products`, `read_inventory`, `read_customers`, `read_fulfillments` (+ `read_merchant_managed_fulfillment_orders`/`read_assigned_fulfillment_orders`/`read_third_party_fulfillment_orders` variants, S20), `read_shopify_payments_payouts` and `read_shopify_payments_disputes` (CON-06). No write scopes.

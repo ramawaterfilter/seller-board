@@ -1,0 +1,35 @@
+[project]
+name = "rama-commerce-intelligence"
+version = "0.1.0"
+description = "Rama Commerce Intelligence API foundation"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "fastapi>=0.115,<0.116",
+    "uvicorn>=0.34,<0.35",
+    "pydantic-settings>=2.8,<3",
+    "sqlalchemy>=2.0,<2.1",
+    "alembic>=1.15,<2",
+    "psycopg[binary]>=3.2,<4",
+    "asyncpg>=0.30,<1",
+    "redis>=5,<6",
+    "argon2-cffi>=25,<26",
+    "cryptography>=46,<47",
+]
+
+[dependency-groups]
+dev = ["pytest>=8.3,<9", "pytest-cov>=6,<7", "httpx>=0.28,<0.29", "ruff>=0.11,<0.12"]
+
+[tool.pytest.ini_options]
+testpaths = ["api/tests"]
+pythonpath = ["api/src"]
+markers = ["req(id): scope register requirement", "db: requires PostgreSQL and Redis"]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "DTZ"]
+
+[tool.coverage.run]
+concurrency = ["thread", "greenlet"]

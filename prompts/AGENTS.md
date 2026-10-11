@@ -271,3 +271,17 @@ Report only P0/P1. Nested AGENTS.md files add rules for their directories.
   flagged as a DISC- BLOCKER.
 - Migration without tested downgrade or more than one alembic head; error response outside the
   envelope; missing `workspace_id` or permission-scope filter.
+
+## Session continuity (local development)
+At the start of every session read `docs/knowledge-bank/STATUS.md` and
+`docs/knowledge-bank/ARCHITECTURE.md` before exploring application code. Read
+`docs/knowledge-bank/DECISIONS.md` when changing architecture or scope. These are
+navigation and progress notes; the register and specifications remain authoritative.
+Inspect the current files and working state for the task, then read only the relevant
+specification sections. Do not assume status notes prove implementation or acceptance.
+Before ending a session update STATUS.md (what works, checks actually run, blockers,
+next concrete step) and append a dated entry to CHANGELOG.md. Update ARCHITECTURE.md
+and DECISIONS.md when relevant. Never mark a work package complete until its gates pass.
+The user authorized local implementation on 2026-10-12; cloud setup instructions in
+the handoff describe a later delivery route. Do not request renewed permission for
+ordinary local work. Human discovery/acceptance and production gates still apply.
